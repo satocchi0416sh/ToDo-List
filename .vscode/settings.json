@@ -1,9 +1,12 @@
 {
-    "C_Cpp.default.compilerPath": "C:\\msys64\\mingw64\\bin\\g++.exe",
+    "C_Cpp.default.compilerPath": "/usr/bin/clang++",
     "C_Cpp.default.includePath": [
-        "$(WXWIN)\\include\\msvc; $(WXWIN)\\include",
-        "$(WXWIN)\\lib\\vc_lib"
+        "/opt/homebrew/Cellar/wxwidgets/3.2.7/include/wx-3.2",
+        "/opt/homebrew/Cellar/wxwidgets/3.2.7/include/wx-3.2/wx",
+        "/opt/homebrew/include"
     ],
+    "C_Cpp.default.intelliSenseMode": "macos-clang-arm64",
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "files.associations": {
         "string": "cpp",
         "array": "cpp",

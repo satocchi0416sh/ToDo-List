@@ -7,18 +7,34 @@
                 "C:/GUI Library/include",
                 "C:/GUI Library/include/msvc",
                 "C:/GUI Library/lib/vc_lib"
-
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"
             ],
-            "compilerPath": "C:\\msys64\\mingw64\\bin\\g++.exe",
+            "compilerPath": "/usr/bin/g++",
             "windowsSdkVersion": "10.0.22621.0",
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "windows-gcc-x86"
+        },
+        {
+            "name": "Mac",
+            "includePath": [
+                "${default}",
+                "/opt/homebrew/Cellar/wxwidgets/3.2.7/include/wx-3.2",
+                "/opt/homebrew/Cellar/wxwidgets/3.2.7/include/wx-3.2/wx",
+                "/opt/homebrew/include"
+            ],
+            "defines": [],
+            "macFrameworkPath": [
+                "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"
+            ],
+            "compilerPath": "/usr/bin/clang++",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "macos-clang-arm64"
         }
     ],
     "version": 4

@@ -1,0 +1,56 @@
+# C++ 関連
+*.o
+*.obj
+*.exe
+*.out
+*.app
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+
+# ビルドディレクトリ
+build/
+bin/
+Debug/
+Release/
+x64/
+x86/
+[Bb]uild/
+
+# コンパイラキャッシュ
+.cache/
+compile_commands.json
+
+# IDE関連
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.vs/
+
+# CMake関連
+CMakeFiles/
+CMakeCache.txt
+CMakeScripts/
+Testing/
+cmake_install.cmake
+install_manifest.txt
+Makefile
+
+# macOS関連
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# 依存関係管理
+vcpkg_installed/
+
+# ログファイル
+*.log
+
+# プロジェクト特有の一時ファイル
+tmp/
+temp/

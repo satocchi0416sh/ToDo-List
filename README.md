@@ -1,33 +1,44 @@
-# To - Do List 
-A C++ Graphical User Interface application created by using the cross platform WxWidgets GUI Library. 
+# ToDoリストアプリ
 
-This project runs on all OS and uses native controls when displaying the window, which means that the game looks slightly different depending on which OS you are playing it on. Regardless, there should be no issue whatsoever.
+**未来をつくる生成AI - 20250531 平野学宜** 講演デモアプリケーション
 
-The ToDo List is very simple. The user can add tasks to the checklist by entering the task in the input field and adding the task in the Checklist box by either pressing Enter key or clicking on the Add button. The user can select tasks, navigate tasks by using arrow keys and can check/uncheck the tasks by clicking on the box present at the left of each task. The user can delete the selected task by pressing Del key and the can clear the entire checklist box by clicking on the Clear button.
+C++ + wxWidgetsで作成されたクロスプラットフォーム対応のシンプルなToDoリストアプリです。
 
-The ToDo List saves all the tasks in a text file after closing the app. When the app is opened again, all the tasks are loaded from the text file along with the checked/unchecked status of each task.
+## 現在の機能
+- タスクの追加（Enter キーまたは Add ボタン）
+- タスクのチェック/アンチェック
+- タスクの選択・ナビゲーション（矢印キー）
+- タスクの削除（Del キー）
+- 全タスクのクリア（Clear ボタン）
+- タスクの自動保存・読み込み（アプリ終了時/起動時）
 
+## 必要な環境
+1. C++コンパイラ
+2. Visual Studio（または.slnファイル対応IDE）
+3. wxWidgetsライブラリ（コンパイル済み）
+4. 環境変数 WXWIN の設定（wxWidgetsフォルダパスを指定）
 
-## Pre Requisites
-1. A C++ language compiler.
-2. Visual Studio or any other IDE which can open .sln files.
-3. WxWidgets Library installed and already compiled on your system.
+## 実行方法
+1. リポジトリをダウンロード
+2. Visual Studioで.slnファイルを開く
+3. Ctrl + F5 で実行
 
-https://youtu.be/FOIbK4bJKS8?si=WN9qbtPVJxfJDM4P
-You can use this link to install and build the wxwidgets library on your system. Skip to 10:20.
+---
 
-## Most Important step!!!
-Make sure to add the path of the WxWidgets folder installed on your system to the Environment Variables and name this variable as WXWIN  .
-You can refer to the Youtube video link posted above and skip to 17:25.
+## 🚀 機能強化アイデア（開発デモ参考例）
 
+### 基本機能拡張
+1. **タスク編集機能**: リスト項目をダブルクリックで直接編集
+2. **タスクカウンター**: 「完了: 3/10 タスク」形式の進捗表示
+3. **タスク複製**: 選択中のタスクを複製して新規追加
+4. **完了時音声フィードバック**: タスクチェック時の効果音再生
 
-## Running the Application
-1. Download all the files in this repository.
-2. Open the Guess The Number.sln file in Visual Studio or any other suitable IDE.  
-3. Click Run or simply press Ctrl + F5 in Visual Studio and enjoy!! :D
+### UI・操作性向上
+5. **ショートカットキー拡張**: Ctrl+D（複製）、Ctrl+A（全選択）、F2（編集）
+6. **完了タスク自動分離**: チェック済みタスクを自動的にリスト下部に移動
+7. **タスク検索機能**: リアルタイム検索によるタスクフィルタリング
 
-
-## Thanks for trying out my app. :)
-
-## Demo:- 
-https://github.com/user-attachments/assets/3bf523c5-2c95-409e-934f-016a68ba91e0
+### 高度な管理機能
+8. **優先度設定**: タスクに高・中・低の優先度を設定、色分け表示
+9. **期限設定とアラート**: タスクに期限を設定、期限接近時の視覚的警告
+10. **カテゴリ機能**: 「仕事・プライベート・買い物」等のカテゴリ分類

@@ -2,10 +2,10 @@
 #include <wx/wx.h>
 #include "MainWindow.h"
 
-class cApp : public wxApp{
+class cApp : public wxApp
+{
 public:
-	MainWindow* window = nullptr;
+	MainWindow *window = nullptr;
 
 	virtual bool OnInit();
 };
-

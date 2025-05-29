@@ -3,10 +3,11 @@
 #include <vector>
 #include <fstream>
 
-struct Task{
+struct Task
+{
     std::string TaskName;
     bool IsChecked;
 };
 
-void WriteToFile(const std::string filename, const std::vector <Task> TaskList);
-std::vector <Task> ReadFromFile(const std::string filename); 
+void WriteToFile(const std::string filename, const std::vector<Task> TaskList);
+std::vector<Task> ReadFromFile(const std::string filename);

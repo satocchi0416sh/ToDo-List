@@ -5,27 +5,26 @@
 #include <vector>
 #include <string>
 
-
-class MainWindow : public wxFrame{
+class MainWindow : public wxFrame
+{
 public:
-	MainWindow(const wxString& title);
+	MainWindow(const wxString &title);
 
-	wxFont* HeadlineFont = nullptr;
-	wxFont* MainFont = nullptr;
-	
-	wxPanel* Panel = nullptr;
-	wxTextCtrl* Heading = nullptr;
-	wxTextCtrl* TextBox = nullptr;
-	wxButton* AddButton = nullptr;
-	wxCheckListBox* CheckList = nullptr;
-	wxButton* ClearButton = nullptr;
+	wxFont *HeadlineFont = nullptr;
+	wxFont *MainFont = nullptr;
 
-	wxBoxSizer* OuterSizer = nullptr;
-	wxBoxSizer* InnerSizer = nullptr;
-	wxBoxSizer* InputSizer = nullptr;
+	wxPanel *Panel = nullptr;
+	wxTextCtrl *Heading = nullptr;
+	wxTextCtrl *TextBox = nullptr;
+	wxButton *AddButton = nullptr;
+	wxCheckListBox *CheckList = nullptr;
+	wxButton *ClearButton = nullptr;
 
-	std::vector <Task> TaskList = {};
+	wxBoxSizer *OuterSizer = nullptr;
+	wxBoxSizer *InnerSizer = nullptr;
+	wxBoxSizer *InputSizer = nullptr;
 
+	std::vector<Task> TaskList = {};
 
 	void AddControls();
 	void AddSizers();
@@ -43,4 +42,3 @@ public:
 	void AddTaskToChecklist();
 	void SaveTaskInTxtFile();
 };
-

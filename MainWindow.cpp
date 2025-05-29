@@ -11,7 +11,7 @@ MainWindow::MainWindow(const wxString &title) : wxFrame(nullptr, wxID_ANY, title
 	AddControls();
 	AddSizers();
 	BindEventHandlers();
-	LoadTaskFromTxtFile();
+	LoadTaskFromFile();
 	UpdateTaskDisplay();
 }
 
@@ -51,6 +51,16 @@ void MainWindow::AddControls()
 																	wxDefaultPosition, wxDefaultSize,
 																	filterChoices, 1, wxRA_SPECIFY_ROWS);
 
+	// データ保存形式用のラジオボックス
+	wxArrayString formatChoices;
+	formatChoices.Add("テキスト形式");
+	formatChoices.Add("JSON形式");
+	FormatRadioBox = new wxRadioBox(Panel, wxID_ANY, "保存形式",
+																	wxDefaultPosition, wxDefaultSize,
+																	formatChoices, 1, wxRA_SPECIFY_ROWS);
+	// デフォルトでJSON形式を選択
+	FormatRadioBox->SetSelection(FORMAT_JSON);
+
 	ClearButton = new wxButton(Panel, wxID_ANY, "クリア");
 }
 
@@ -85,9 +95,11 @@ void MainWindow::AddSizers()
 	InnerSizer->Add(CheckList, wxSizerFlags().Proportion(1).Expand());
 	InnerSizer->AddSpacer(10);
 
-	// フィルターとクリアボタンの配置
+	// フィルターとフォーマットとクリアボタンの配置
 	FilterSizer = new wxBoxSizer(wxHORIZONTAL);
 	FilterSizer->Add(FilterRadioBox, wxSizerFlags().Proportion(1).Expand());
+	FilterSizer->AddSpacer(10);
+	FilterSizer->Add(FormatRadioBox, wxSizerFlags().Proportion(1).Expand());
 	FilterSizer->AddSpacer(10);
 	FilterSizer->Add(ClearButton, wxSizerFlags().CenterVertical());
 
@@ -112,6 +124,7 @@ void MainWindow::BindEventHandlers()
 	SearchBox->Bind(wxEVT_TEXT, &MainWindow::OnSearchTextChanged, this);
 	ClearSearchButton->Bind(wxEVT_BUTTON, &MainWindow::OnClearSearchButtonClick, this);
 	FilterRadioBox->Bind(wxEVT_RADIOBOX, &MainWindow::OnFilterChanged, this);
+	FormatRadioBox->Bind(wxEVT_RADIOBOX, &MainWindow::OnFormatChanged, this);
 	EditButton->Bind(wxEVT_BUTTON, &MainWindow::OnEditButtonClick, this);
 	CheckList->Bind(wxEVT_LISTBOX_DCLICK, &MainWindow::OnCheckListDoubleClick, this);
 	CheckList->Bind(wxEVT_CHECKLISTBOX, &MainWindow::OnCheckListItemCheck, this);
@@ -125,9 +138,17 @@ void MainWindow::BindEventHandlers()
 	this->Bind(wxEVT_CLOSE_WINDOW, &MainWindow::OnWindowClose, this);
 }
 
-void MainWindow::LoadTaskFromTxtFile()
+void MainWindow::LoadTaskFromFile()
 {
-	TaskList = ReadFromFile("tasks");
+	// 現在の保存形式に応じてファイルから読み込み
+	if (CurrentFormat == FORMAT_JSON)
+	{
+		TaskList = ReadFromJsonFile("tasks");
+	}
+	else
+	{
+		TaskList = ReadFromFile("tasks");
+	}
 	UpdateTaskDisplay();
 }
 
@@ -199,104 +220,35 @@ void MainWindow::OnEnterKeyPress(wxKeyEvent &evt)
 
 void MainWindow::OnDelKeyPress(wxKeyEvent &evt)
 {
-	int SelectedItemIndex = CheckList->GetSelection();
-	int TotalItems = CheckList->GetCount();
-
-	if (evt.GetKeyCode() == WXK_DELETE && SelectedItemIndex != wxNOT_FOUND)
+	if (evt.GetKeyCode() == WXK_DELETE)
 	{
-		// 実際のフィルタされたリストのインデックスを取得
-		int originalIndex = -1;
-		if (SelectedItemIndex < FilteredTaskList.size())
+		int selectedItemIndex = CheckList->GetSelection();
+		if (selectedItemIndex != wxNOT_FOUND)
 		{
-			// フィルタリストから元のタスクリストのインデックスを見つける
-			wxString selectedTask = CheckList->GetString(SelectedItemIndex);
+			// 選択されたアイテムをフィルタリスト内から削除
+			wxString selectedItemText = CheckList->GetString(selectedItemIndex);
+
+			// 元のタスクリストから該当するタスクを探して削除
 			for (size_t i = 0; i < TaskList.size(); i++)
 			{
-				if (TaskList[i].TaskName == selectedTask)
+				if (TaskList[i].TaskName == selectedItemText)
 				{
-					originalIndex = i;
+					TaskList.erase(TaskList.begin() + i);
 					break;
 				}
 			}
 
-			if (originalIndex != -1)
-			{
-				TaskList.erase(TaskList.begin() + originalIndex);
-				UpdateTaskDisplay();
-
-				// 削除後の選択位置を調整
-				if (SelectedItemIndex == TotalItems - 1 && SelectedItemIndex - 1 >= 0)
-				{
-					CheckList->Select(SelectedItemIndex - 1);
-				}
-				else if (!CheckList->IsEmpty())
-				{
-					CheckList->Select(SelectedItemIndex);
-				}
-			}
+			// 表示を更新
+			UpdateTaskDisplay();
 		}
 	}
-
-	if (CheckList->IsEmpty())
-	{
-		TextBox->SetFocus();
-	}
+	evt.Skip();
 }
 
 void MainWindow::OnNavigationKeyPress(wxKeyEvent &evt)
 {
-	int SelectedItemIndex = CheckList->GetSelection();
-	if (SelectedItemIndex == wxNOT_FOUND)
-	{
-		return;
-	}
-
-	int KeyCode = evt.GetKeyCode();
-	int TotalItems = CheckList->GetCount();
-
-	switch (KeyCode)
-	{
-	case WXK_UP:
-		CheckList->Deselect(SelectedItemIndex);
-		if (SelectedItemIndex == 0)
-		{
-			CheckList->Select(TotalItems - 1);
-		}
-		else
-		{
-			CheckList->Select(SelectedItemIndex - 1);
-		}
-		break;
-
-	case WXK_DOWN:
-		CheckList->Deselect(SelectedItemIndex);
-		if (SelectedItemIndex == TotalItems - 1)
-		{
-			CheckList->Select(0);
-		}
-		else
-		{
-			CheckList->Select(SelectedItemIndex + 1);
-		}
-		break;
-	}
-
+	// チェックリスト内のキー操作をカスタマイズ（必要に応じて）
 	evt.Skip();
-}
-
-void MainWindow::OnClearButtonClick(wxCommandEvent &evt)
-{
-	// 確認ダイアログを表示
-	wxMessageDialog dialog(this, "すべてのタスクを削除してもよろしいですか？",
-												 "確認", wxYES_NO | wxICON_QUESTION);
-	int result = dialog.ShowModal();
-
-	if (result == wxID_YES)
-	{
-		TaskList.clear();
-		UpdateTaskDisplay();
-		TextBox->SetFocus();
-	}
 }
 
 // 検索テキストが変更された時のイベント
@@ -305,45 +257,53 @@ void MainWindow::OnSearchTextChanged(wxCommandEvent &evt)
 	UpdateTaskDisplay();
 }
 
-// 検索クリアボタンがクリックされた時のイベント
+// 検索クリアボタンが押された時のイベント
 void MainWindow::OnClearSearchButtonClick(wxCommandEvent &evt)
 {
 	SearchBox->Clear();
 	UpdateTaskDisplay();
-	TextBox->SetFocus();
 }
 
 // フィルターが変更された時のイベント
 void MainWindow::OnFilterChanged(wxCommandEvent &evt)
 {
-	int selection = FilterRadioBox->GetSelection();
-	switch (selection)
-	{
-	case 0:
-		CurrentFilter = FILTER_ALL;
-		break;
-	case 1:
-		CurrentFilter = FILTER_COMPLETED;
-		break;
-	case 2:
-		CurrentFilter = FILTER_INCOMPLETE;
-		break;
-	}
-
+	CurrentFilter = (FilterMode)evt.GetInt();
 	UpdateTaskDisplay();
 }
 
-// 編集ボタンがクリックされた時のイベント
+// 保存形式が変更された時のイベント
+void MainWindow::OnFormatChanged(wxCommandEvent &evt)
+{
+	// 現在のデータを一時保存
+	std::vector<Task> tempTaskList = TaskList;
+
+	// 保存形式を更新
+	CurrentFormat = (StorageFormat)evt.GetInt();
+
+	// 現在のデータを新しい形式で保存
+	SaveTaskInFile();
+
+	// 一時的に保存したタスクを戻す
+	TaskList = tempTaskList;
+	UpdateTaskDisplay();
+}
+
+// 編集ボタンが押された時のイベント
 void MainWindow::OnEditButtonClick(wxCommandEvent &evt)
 {
-	int selectedIndex = CheckList->GetSelection();
-	if (selectedIndex != wxNOT_FOUND)
+	if (!IsEditing)
 	{
-		EnterEditMode(selectedIndex);
+		// 選択されたアイテムがあれば編集モードに入る
+		int selectedIndex = CheckList->GetSelection();
+		if (selectedIndex != wxNOT_FOUND)
+		{
+			EnterEditMode(selectedIndex);
+		}
 	}
 	else
 	{
-		wxMessageBox("編集するタスクを選択してください。", "情報", wxOK | wxICON_INFORMATION);
+		// 編集モードを終了（変更を破棄）
+		ExitEditMode(false);
 	}
 }
 
@@ -488,13 +448,36 @@ void MainWindow::UpdateCheckList()
 	}
 }
 
-void MainWindow::SaveTaskInTxtFile()
+void MainWindow::SaveTaskInFile()
 {
-	WriteToFile("tasks", TaskList);
+	// 現在の保存形式に応じてファイルに保存
+	if (CurrentFormat == FORMAT_JSON)
+	{
+		WriteToJsonFile("tasks", TaskList);
+	}
+	else
+	{
+		WriteToFile("tasks", TaskList);
+	}
 }
 
 void MainWindow::OnWindowClose(wxCloseEvent &evt)
 {
-	SaveTaskInTxtFile();
+	SaveTaskInFile();
 	evt.Skip();
+}
+
+void MainWindow::OnClearButtonClick(wxCommandEvent &evt)
+{
+	// 確認ダイアログを表示
+	wxMessageDialog confirmDialog(this,
+																"本当にすべてのタスクを削除しますか？",
+																"確認",
+																wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
+
+	if (confirmDialog.ShowModal() == wxID_YES)
+	{
+		TaskList.clear();
+		UpdateTaskDisplay();
+	}
 }

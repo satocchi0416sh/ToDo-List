@@ -12,6 +12,13 @@ enum FilterMode
 	FILTER_INCOMPLETE
 };
 
+// データ保存形式の列挙型
+enum StorageFormat
+{
+	FORMAT_TEXT,
+	FORMAT_JSON
+};
+
 class MainWindow : public wxFrame
 {
 public:
@@ -42,11 +49,16 @@ public:
 	wxRadioBox *FilterRadioBox = nullptr;
 	FilterMode CurrentFilter = FILTER_ALL;
 
+	// データ保存形式選択のためのコントロール
+	wxRadioBox *FormatRadioBox = nullptr;
+	StorageFormat CurrentFormat = FORMAT_JSON; // デフォルトでJSON形式を使用
+
 	wxBoxSizer *OuterSizer = nullptr;
 	wxBoxSizer *InnerSizer = nullptr;
 	wxBoxSizer *InputSizer = nullptr;
 	wxBoxSizer *SearchSizer = nullptr;
 	wxBoxSizer *FilterSizer = nullptr;
+	wxBoxSizer *FormatSizer = nullptr;
 	wxBoxSizer *ButtonSizer = nullptr;
 
 	std::vector<Task> TaskList = {};
@@ -55,7 +67,7 @@ public:
 	void AddControls();
 	void AddSizers();
 	void BindEventHandlers();
-	void LoadTaskFromTxtFile();
+	void LoadTaskFromFile();
 
 	void OnMouseClick(wxMouseEvent &evt);
 	void OnAddButtonClick(wxCommandEvent &evt);
@@ -70,11 +82,12 @@ public:
 	void OnSearchTextChanged(wxCommandEvent &evt);
 	void OnClearSearchButtonClick(wxCommandEvent &evt);
 	void OnFilterChanged(wxCommandEvent &evt);
+	void OnFormatChanged(wxCommandEvent &evt); // 保存形式変更イベント
 	void OnCheckListDoubleClick(wxCommandEvent &evt);
 	void OnCheckListItemCheck(wxCommandEvent &evt);
 
 	void AddTaskToChecklist();
-	void SaveTaskInTxtFile();
+	void SaveTaskInFile();
 
 	// 新しいメソッド
 	void EnterEditMode(int index);

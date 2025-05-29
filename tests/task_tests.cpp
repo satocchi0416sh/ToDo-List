@@ -3,9 +3,11 @@
 #include <fstream>
 #include <cstdio>
 #include <vector>
+#include <nlohmann/json.hpp>
 
 // テスト用のファイル名
 const std::string TEST_FILENAME = "test_tasks";
+const std::string TEST_JSON_FILENAME = "test_json_tasks";
 
 // テスト前後の処理
 class TaskTest : public ::testing::Test
@@ -15,12 +17,14 @@ protected:
   {
     // テスト前にテストファイルが存在する場合は削除
     std::remove((TEST_FILENAME + ".txt").c_str());
+    std::remove((TEST_JSON_FILENAME + ".json").c_str());
   }
 
   void TearDown() override
   {
     // テスト後にテストファイルを削除
     std::remove((TEST_FILENAME + ".txt").c_str());
+    std::remove((TEST_JSON_FILENAME + ".json").c_str());
   }
 };
 
@@ -164,10 +168,10 @@ TEST_F(TaskTest, TaskNameWithSpecialChars)
 
   tasks.push_back(task);
 
-  // 書き込み
+  // ファイルに書き込み
   WriteToFile(TEST_FILENAME, tasks);
 
-  // 読み込み
+  // ファイルから読み込み
   std::vector<Task> loadedTasks = ReadFromFile(TEST_FILENAME);
 
   // 検証
@@ -175,4 +179,97 @@ TEST_F(TaskTest, TaskNameWithSpecialChars)
   // スペースとアンダースコアの変換を考慮して検証
   EXPECT_EQ(loadedTasks[0].TaskName, "特殊!@#$%^&*() +{}|:<>?");
   EXPECT_TRUE(loadedTasks[0].IsChecked);
+}
+
+// JSONへの変換テスト
+TEST_F(TaskTest, TaskToJsonConversion)
+{
+  Task task;
+  task.TaskName = "JSONテスト";
+  task.IsChecked = true;
+
+  // TaskをJSONに変換
+  nlohmann::json j = TaskToJson(task);
+
+  // 検証
+  EXPECT_EQ(j["name"], "JSONテスト");
+  EXPECT_EQ(j["completed"], true);
+}
+
+// JSONからTaskへの変換テスト
+TEST_F(TaskTest, JsonToTaskConversion)
+{
+  nlohmann::json j;
+  j["name"] = "JSONからタスクへ";
+  j["completed"] = false;
+
+  // JSONからTaskに変換
+  Task task = JsonToTask(j);
+
+  // 検証
+  EXPECT_EQ(task.TaskName, "JSONからタスクへ");
+  EXPECT_FALSE(task.IsChecked);
+}
+
+// JSONファイルへの書き込みと読み込みテスト
+TEST_F(TaskTest, WriteAndReadFromJsonFile)
+{
+  // テスト用のタスクリスト作成
+  std::vector<Task> tasks;
+  Task task1, task2;
+
+  task1.TaskName = "JSONタスク1";
+  task1.IsChecked = true;
+
+  task2.TaskName = "JSONタスク2";
+  task2.IsChecked = false;
+
+  tasks.push_back(task1);
+  tasks.push_back(task2);
+
+  // JSONファイルに書き込み
+  WriteToJsonFile(TEST_JSON_FILENAME, tasks);
+
+  // JSONファイルから読み込み
+  std::vector<Task> loadedTasks = ReadFromJsonFile(TEST_JSON_FILENAME);
+
+  // 検証
+  ASSERT_EQ(loadedTasks.size(), 2);
+
+  EXPECT_EQ(loadedTasks[0].TaskName, "JSONタスク1");
+  EXPECT_TRUE(loadedTasks[0].IsChecked);
+
+  EXPECT_EQ(loadedTasks[1].TaskName, "JSONタスク2");
+  EXPECT_FALSE(loadedTasks[1].IsChecked);
+}
+
+// 空のJSONタスクリストのテスト
+TEST_F(TaskTest, EmptyJsonTaskList)
+{
+  std::vector<Task> emptyTasks;
+
+  // 空のリストをJSONファイルに書き込み
+  WriteToJsonFile(TEST_JSON_FILENAME, emptyTasks);
+
+  // JSONファイルから読み込み
+  std::vector<Task> loadedTasks = ReadFromJsonFile(TEST_JSON_FILENAME);
+
+  // 検証
+  EXPECT_TRUE(loadedTasks.empty());
+}
+
+// 存在しないJSONファイルからの読み込みテスト
+TEST_F(TaskTest, ReadFromNonExistentJsonFile)
+{
+  // 存在しないJSONファイル名を指定
+  std::string nonExistentFile = "non_existent_json_file";
+
+  // ファイルが存在しないことを確認
+  std::remove((nonExistentFile + ".json").c_str());
+
+  // 存在しないJSONファイルから読み込み試行
+  std::vector<Task> loadedTasks = ReadFromJsonFile(nonExistentFile);
+
+  // 空のベクトルが返されることを検証
+  EXPECT_TRUE(loadedTasks.empty());
 }

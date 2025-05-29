@@ -9,6 +9,17 @@ option(CODE_COVERAGE "Enable coverage reporting" ON)
 include(CTest)
 enable_testing()
 
+# nlohmann/jsonライブラリの追加
+# 単一ヘッダーファイルをダウンロードするだけの簡単な方法
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+include(FetchContent)
+FetchContent_Declare(
+    json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.11.2
+)
+FetchContent_MakeAvailable(json)
+
 # wxWidgetsを探す
 find_package(wxWidgets REQUIRED COMPONENTS core base richtext)
 include(${wxWidgets_USE_FILE})
@@ -24,7 +35,7 @@ set(SOURCES
 add_executable(ToDo_List ${SOURCES})
 
 # wxWidgetsのライブラリをリンク
-target_link_libraries(ToDo_List ${wxWidgets_LIBRARIES})
+target_link_libraries(ToDo_List ${wxWidgets_LIBRARIES} nlohmann_json::nlohmann_json)
 
 # C++11標準を使用
 set_target_properties(ToDo_List PROPERTIES
@@ -56,8 +67,8 @@ if(BUILD_TESTS)
     # テスト用の実行ファイル
     add_executable(ToDo_Tests tests/task_tests.cpp Task.cpp)
     
-    # テスト実行ファイルにGoogle Testをリンク
-    target_link_libraries(ToDo_Tests GTest::gtest_main)
+    # テスト実行ファイルにGoogle Testとnlohmann/jsonをリンク
+    target_link_libraries(ToDo_Tests GTest::gtest_main nlohmann_json::nlohmann_json)
     
     # テストのインクルードディレクトリを追加
     target_include_directories(ToDo_Tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
